@@ -7,6 +7,9 @@ from datetime import datetime
 import inspect
 import models
 from models.engine import file_storage
+from models.engine.file_storage import FileStorage
+from models import storage
+from models.base_model import BaseModel
 from models.amenity import Amenity
 from models.base_model import BaseModel
 from models.city import City
@@ -113,3 +116,26 @@ class TestFileStorage(unittest.TestCase):
         with open("file.json", "r") as f:
             js = f.read()
         self.assertEqual(json.loads(string), json.loads(js))
+
+class TestFileStorage(unittest.TestCase):
+    def setUp(self):
+        self.storage = FileStorage()
+
+    def test_get(self):
+        obj = BaseModel()
+        self.storage.new(obj)
+        self.storage.save()
+        self.assertEqual(self.storage.get(BaseModel, obj.id), obj)
+        self.assertIsNone(self.storage.get(BaseModel, "non_existent_id"))
+
+    def test_count(self):
+        initial_count = self.storage.count()
+        obj = BaseModel()
+        self.storage.new(obj)
+        self.storage.save()
+        self.assertEqual(self.storage.count(), initial_count + 1)
+        self.assertEqual(self.storage.count(BaseModel), initial_count + 1)
+        self.assertEqual(self.storage.count("NonExistentClass"), 0)
+
+if __name__ == "__main__":
+    unittest.main()

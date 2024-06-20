@@ -6,6 +6,9 @@ Contains the TestDBStorageDocs and TestDBStorage classes
 from datetime import datetime
 import inspect
 import models
+from models.engine.db_storage import DBStorage
+from models import storage
+from models.base_model import BaseModel
 from models.engine import db_storage
 from models.amenity import Amenity
 from models.base_model import BaseModel
@@ -86,3 +89,26 @@ class TestFileStorage(unittest.TestCase):
     @unittest.skipIf(models.storage_t != 'db', "not testing db storage")
     def test_save(self):
         """Test that save properly saves objects to file.json"""
+
+class TestDBStorage(unittest.TestCase):
+    def setUp(self):
+        self.storage = DBStorage()
+
+    def test_get(self):
+        obj = BaseModel()
+        self.storage.new(obj)
+        self.storage.save()
+        self.assertEqual(self.storage.get(BaseModel, obj.id), obj)
+        self.assertIsNone(self.storage.get(BaseModel, "non_existent_id"))
+
+    def test_count(self):
+        initial_count = self.storage.count()
+        obj = BaseModel()
+        self.storage.new(obj)
+        self.storage.save()
+        self.assertEqual(self.storage.count(), initial_count + 1)
+        self.assertEqual(self.storage.count(BaseModel), initial_count + 1)
+        self.assertEqual(self.storage.count("NonExistentClass"), 0)
+
+if __name__ == "__main__":
+    unittest.main()
