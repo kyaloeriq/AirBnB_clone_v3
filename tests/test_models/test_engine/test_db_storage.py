@@ -93,6 +93,10 @@ class TestFileStorage(unittest.TestCase):
 class TestDBStorage(unittest.TestCase):
     def setUp(self):
         self.storage = DBStorage()
+        self.storage.reload()
+
+    def tearDown(self):
+        self.storage.close()
 
     def test_get(self):
         obj = BaseModel()

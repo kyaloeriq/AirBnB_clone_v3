@@ -120,6 +120,10 @@ class TestFileStorage(unittest.TestCase):
 class TestFileStorage(unittest.TestCase):
     def setUp(self):
         self.storage = FileStorage()
+        self.storage.reload()
+
+    def tearDown(self):
+        self.storage.save()
 
     def test_get(self):
         obj = BaseModel()
